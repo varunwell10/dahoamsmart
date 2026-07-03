@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  ============================================================================
+  README — Smart-Home & Energiemanagement Consulting · "Coming Soon" Landing
+  ============================================================================
+
+  This is a fully self-contained, privacy-first, tracker-free single-page site.
+  It renders beautifully out of the box using a CSS-animated gradient hero,
+  so no assets are required to look great. Two things you can wire up later:
+
+  (1) DROP IN A REAL HERO VIDEO
+      - Find a royalty-free clip (smart home / energy / tech) at a free stock
+        source such as:
+          • https://www.pexels.com/videos/   (Pexels Videos — free, no attribution)
+          • https://coverr.co/                (Coverr — free stock video)
+          • https://www.videvo.net/           (Videvo — check per-clip license)
+      - Download an MP4 (H.264), keep it short (~10–20s), muted, ~1080p, and
+        compress it (e.g. with HandBrake) to a few MB for fast loading.
+      - Save it as:   assets/hero.mp4
+      - (Optional) Save a first-frame still as:   assets/hero-poster.jpg
+        so a static image shows while the video buffers / on reduced-data.
+      - That's it. The <video> tag below already points at those paths. If the
+        file is missing, the animated gradient fallback shows automatically.
+
+  (2) ACTIVATE EMAIL DELIVERY OF WAITLIST SIGNUPS  →  dahoamsmart@gmail.com
+      A static HTML page cannot send email on its own. Signups reach the
+      inbox one of two ways. THE ONE MANUAL STEP is to paste your endpoint ID
+      into the FORM_ENDPOINT constant in the <script> at the bottom of this
+      file (search for "FORM_ENDPOINT"). Until you do, the form automatically
+      falls back to a mailto: draft so it still works.
+
+      RECOMMENDED — EU/DSGVO-friendly form backend (real Double-Opt-In):
+        • Create a free form at Formspree and choose the EU data region
+          (https://formspree.io — EU/GDPR region), OR self-host a form relay
+          such as https://github.com/formspree/formspree or Listmonk.
+        • Set the form's target email to  dahoamsmart@gmail.com.
+        • Enable the provider's DOUBLE-OPT-IN / confirmation-email feature so
+          each subscriber must click a confirmation link before they are added
+          (DSGVO Art. 6 Abs. 1 lit. a). The backend sends that email, not this
+          page.
+        • Copy the endpoint (e.g. https://formspree.io/f/abcdwxyz) and paste it
+          into FORM_ENDPOINT below. Done — submissions POST straight to it.
+        • DSGVO: sign a data-processing agreement (AVV / DPA) with the chosen
+          provider and keep hosting in the EU. Add the provider to the
+          Datenschutzerklärung as an Auftragsverarbeiter before going live.
+
+      FALLBACK — zero-dependency mailto: (works immediately, no backend):
+        • If FORM_ENDPOINT is left blank, submitting opens the visitor's mail
+          client with a pre-filled message to dahoamsmart@gmail.com containing
+          the email, optional name and consent timestamp.
+        • NOTE: mailto is NOT ideal — it relies on the visitor having a mail
+          client, sends nothing automatically, and cannot perform a true
+          Double-Opt-In. Use it only until the form backend above is wired up.
+
+      No Google Analytics, no Meta Pixel, no third-party cookies. The form
+      backend is the ONLY external call, and only when the form is submitted.
+
+  ============================================================================
+-->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    SECURITY HARDENING (GitHub Pages)
+    GitHub Pages serves only static files and does NOT let you set custom HTTP
+    response headers. So headers like Strict-Transport-Security (HSTS),
+    X-Frame-Options, Permissions-Policy and X-Content-Type-Options CANNOT be
+    set here — X-Content-Type-Options (nosniff) in particular is header-only
+    and has no <meta> equivalent, so it is intentionally omitted.
+    What CAN be enforced via <meta http-equiv> is done below.
+    When this site later migrates to the Hetzner/Netcup VPS with Caddy, add the
+    full header set there (HSTS incl. preload, X-Content-Type-Options: nosniff,
+    X-Frame-Options: DENY / frame-ancestors, Permissions-Policy, and a CSP
+    delivered as a real response header) — Caddy can set all of these.
+
+    CSP notes: 'unsafe-inline' is required because ALL CSS and JS on this page
+    are inline (self-contained, no build step). Only the Google Fonts origins
+    are allowed as external sources; no third-party scripts or frames are
+    permitted. mailto: is allowed for the waitlist form fallback. If you later
+    set FORM_ENDPOINT to a form backend, add its origin to connect-src below.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data:;
+    media-src 'self';
+    connect-src 'self';
+    form-action 'self' mailto:;
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    upgrade-insecure-requests
+  " />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <meta name="description" content="Herstellerunabhängiges Smart-Home- und Energiemanagement-Consulting für Olching und das FFB-Land auf Basis eines lokalen Home-Servers. Lokal, privat, ohne Cloud-Zwang." />
+  <meta name="robots" content="index,follow" />
+  <title>Dahoam Smart · Smart Home & Energie im Griff · Olching</title>
+
+  <!-- Fonts: Inter via Google Fonts. Falls back to system sans-serif if blocked. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       Design tokens
+       --------------------------------------------------------------------- */
+    :root {
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+              Helvetica, Arial, sans-serif;
+
+      --ink: #0f1c2e;          /* near-black navy for text */
+      --ink-soft: #4a5a6e;     /* muted body text */
+      --line: #e5eaf0;         /* hairline borders */
+      --bg: #ffffff;
+      --bg-alt: #f5f8fb;       /* light section background */
+
+      --accent: #17b890;       /* fresh energy green */
+      --accent-2: #2f80ed;     /* smart-tech blue */
+      --accent-deep: #0e8e6d;
+
+      --radius: 18px;
+      --radius-lg: 26px;
+      --shadow: 0 20px 45px -20px rgba(15, 28, 46, 0.35);
+      --shadow-soft: 0 10px 30px -18px rgba(15, 28, 46, 0.25);
+      --maxw: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 0.5em; }
+    p { margin: 0 0 1em; }
+    a { color: inherit; }
+
+    .container {
+      width: 100%;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 14px;
+    }
+
+    /* ---------------------------------------------------------------------
+       Buttons
+       --------------------------------------------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 15px 26px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff;
+      box-shadow: 0 14px 30px -12px rgba(23, 184, 144, 0.65);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -12px rgba(23, 184, 144, 0.75); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(6px);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.16); }
+    .btn-block { width: 100%; }
+
+    /* ---------------------------------------------------------------------
+       Sticky nav
+       --------------------------------------------------------------------- */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      transition: background .3s ease, box-shadow .3s ease, backdrop-filter .3s ease;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.05rem;
+      transition: color .3s ease;
+    }
+    .brand .logo {
+      width: 34px; height: 34px;
+      display: grid; place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 800;
+      box-shadow: var(--shadow-soft);
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      color: rgba(255,255,255,0.88);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color .2s ease;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-links .btn { padding: 10px 20px; font-size: 0.9rem; }
+
+    /* Scrolled state: solid light bar with dark text */
+    .nav.scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 24px -18px rgba(15,28,46,0.6);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav.scrolled .brand { color: var(--ink); }
+    .nav.scrolled .nav-links a { color: var(--ink-soft); }
+    .nav.scrolled .nav-links a:hover { color: var(--ink); }
+
+    @media (max-width: 760px) {
+      .nav-links a:not(.btn) { display: none; }
+    }
+
+    /* ---------------------------------------------------------------------
+       Hero
+       --------------------------------------------------------------------- */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      color: #fff;
+      isolation: isolate;
+    }
+
+    /* Animated gradient fallback — always present, sits behind the video. */
+    .hero-bg-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background: linear-gradient(-45deg, #071a2b, #0e3b4f, #0b2f4a, #10504a, #0a2540);
+      background-size: 400% 400%;
+      animation: gradientShift 18s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Soft animated "energy" glow blobs for extra depth */
+    .hero-bg-gradient::before,
+    .hero-bg-gradient::after {
+      content: "";
+      position: absolute;
+      width: 55vmax; height: 55vmax;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.4;
+      z-index: -1;
+    }
+    .hero-bg-gradient::before {
+      background: radial-gradient(circle, rgba(23,184,144,0.7), transparent 60%);
+      top: -20%; left: -10%;
+      animation: floatA 22s ease-in-out infinite;
+    }
+    .hero-bg-gradient::after {
+      background: radial-gradient(circle, rgba(47,128,237,0.6), transparent 60%);
+      bottom: -25%; right: -10%;
+      animation: floatB 26s ease-in-out infinite;
+    }
+    @keyframes floatA {
+      0%,100% { transform: translate(0,0); }
+      50%     { transform: translate(8vw, 6vh); }
+    }
+    @keyframes floatB {
+      0%,100% { transform: translate(0,0); }
+      50%     { transform: translate(-7vw, -5vh); }
+    }
+
+    /* The looping background video (shows once assets/hero.mp4 exists). */
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    /* Dark gradient overlay for legibility, on top of video/gradient. */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(180deg, rgba(4,12,22,0.55) 0%, rgba(4,12,22,0.35) 40%, rgba(4,12,22,0.75) 100%),
+        radial-gradient(120% 80% at 20% 20%, rgba(4,12,22,0.15), rgba(4,12,22,0.65));
+    }
+
+    .hero-content {
+      padding: 120px 0 80px;
+      max-width: 760px;
+    }
+    .hero .eyebrow { color: #7ff0cf; }
+    .hero h1 {
+      font-size: clamp(2.3rem, 6vw, 4.1rem);
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+    .hero .lead {
+      font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+      color: rgba(255,255,255,0.9);
+      max-width: 640px;
+      margin-bottom: 32px;
+    }
+
+    /* Glassmorphism waitlist card */
+    .glass {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 26px;
+      max-width: 560px;
+    }
+    .glass h3 { font-size: 1.15rem; color: #fff; margin-bottom: 6px; }
+    .glass .muted { color: rgba(255,255,255,0.75); font-size: 0.92rem; margin-bottom: 18px; }
+
+    .scarcity {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #7ff0cf;
+      background: rgba(23,184,144,0.14);
+      border: 1px solid rgba(23,184,144,0.3);
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(23,184,144,0.7);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(23,184,144,0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(23,184,144,0); }
+      100% { box-shadow: 0 0 0 0 rgba(23,184,144,0); }
+    }
+
+    /* Form fields */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,0.92);
+    }
+    .field input[type="email"],
+    .field input[type="text"] {
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      transition: border .2s ease, background .2s ease;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.55); }
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.85);
+      margin: 6px 0 18px;
+    }
+    .consent input {
+      margin-top: 3px;
+      width: 18px; height: 18px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+    .consent a { color: #7ff0cf; text-decoration: underline; }
+
+    .form-success {
+      display: none;
+      background: rgba(23,184,144,0.16);
+      border: 1px solid rgba(23,184,144,0.4);
+      color: #d6fff2;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.95rem;
+    }
+    .form-note { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 12px; }
+
+    /* ---------------------------------------------------------------------
+       Content sections
+       --------------------------------------------------------------------- */
+    section.block { padding: 96px 0; }
+    section.alt { background: var(--bg-alt); }
+
+    .section-head { max-width: 720px; margin-bottom: 48px; }
+    .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+    .section-head h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+    .section-head p { color: var(--ink-soft); font-size: 1.08rem; }
+
+    /* Problem / Solution split */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+    .ps-card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: var(--shadow-soft);
+    }
+    .ps-card h3 { font-size: 1.2rem; }
+    .ps-list { list-style: none; margin: 0; padding: 0; }
+    .ps-list li {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0;
+      color: var(--ink-soft);
+      border-bottom: 1px solid var(--line);
+    }
+    .ps-list li:last-child { border-bottom: 0; }
+    .ps-list .ic {
+      flex-shrink: 0;
+      width: 24px; height: 24px; border-radius: 7px;
+      display: grid; place-items: center;
+      font-size: 0.8rem; font-weight: 700; color: #fff;
+    }
+    .ps-list .ic.x { background: #e2586b; }
+    .ps-list .ic.v { background: var(--accent); }
+
+    @media (max-width: 820px) {
+      .split { grid-template-columns: 1fr; gap: 28px; }
+    }
+
+    /* Benefit cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-soft);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+    .card .icon {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(23,184,144,0.15), rgba(47,128,237,0.15));
+      margin-bottom: 18px;
+    }
+    .card .icon svg { width: 28px; height: 28px; stroke: var(--accent-deep); }
+    .card h3 { font-size: 1.2rem; }
+    .card p { color: var(--ink-soft); margin: 0; font-size: 0.98rem; }
+
+    @media (max-width: 820px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    /* Beta CTA band */
+    .cta-band {
+      background: linear-gradient(120deg, #0e2f45 0%, #10504a 100%);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 56px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .cta-band h2 { font-size: clamp(1.7rem, 3.5vw, 2.4rem); }
+    .cta-band p { color: rgba(255,255,255,0.85); max-width: 560px; margin: 0 auto 26px; }
+    .cta-band .scarcity { margin-bottom: 20px; }
+
+    /* Disclaimer strip */
+    .disclaimer {
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      background: #fff7e8;
+      border: 1px solid #f2e2bd;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .disclaimer strong { color: var(--ink); }
+
+    /* ---------------------------------------------------------------------
+       Footer
+       --------------------------------------------------------------------- */
+    footer {
+      background: #0b1826;
+      color: rgba(255,255,255,0.72);
+      padding: 60px 0 30px;
+      font-size: 0.92rem;
+    }
+    .foot-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    footer .brand { color: #fff; margin-bottom: 10px; }
+    .foot-links { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .foot-links a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .foot-links a:hover { color: #fff; text-decoration: underline; }
+    .foot-bottom {
+      padding-top: 24px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.5);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+
+    /* Legal sections (Impressum & Datenschutz) */
+    .legal { background: var(--bg-alt); }
+    .legal .container { max-width: 860px; }
+    .legal h2 { font-size: 1.9rem; }
+    .legal h3 { font-size: 1.15rem; margin-top: 28px; }
+    .legal p, .legal li { color: var(--ink-soft); font-size: 0.96rem; }
+    .legal .card-legal {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 34px;
+      box-shadow: var(--shadow-soft);
+    }
+    .legal .placeholder {
+      background: #fff3d6;
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-weight: 600;
+      color: #7a5b00;
+    }
+    .back-top { display: inline-block; margin-top: 20px; font-weight: 600; color: var(--accent-deep); text-decoration: none; }
+    .back-top:hover { text-decoration: underline; }
+
+    /* ---------------------------------------------------------------------
+       Scroll reveal
+       --------------------------------------------------------------------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .hero-bg-gradient,
+      .hero-bg-gradient::before,
+      .hero-bg-gradient::after { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======================= STICKY NAV ======================= -->
+  <nav class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#hero" class="brand">
+        <span class="logo">⌂</span>
+        <span>Dahoam&nbsp;Smart</span>
+      </a>
+      <div class="nav-links">
+        <a href="#loesung">Lösung</a>
+        <a href="#vorteile">Vorteile</a>
+        <a href="#hero" class="btn btn-primary">Auf die Warteliste</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======================= HERO ======================= -->
+  <header class="hero" id="hero">
+    <!-- Animated gradient fallback (always visible if the video is absent) -->
+    <div class="hero-bg-gradient" aria-hidden="true"></div>
+
+    <!--
+      LOOPING BACKGROUND VIDEO
+      Renders once you add assets/hero.mp4 (see README at top of file).
+      Muted + autoplay + loop + playsinline are required for mobile autoplay.
+      The `poster` shows a still while the video buffers; if the file is
+      missing, the animated gradient behind it remains visible.
+    -->
+    <video
+      class="hero-video"
+      autoplay muted loop playsinline
+      preload="none"
+      poster="assets/hero-poster.jpg"
+      aria-hidden="true">
+      <source src="assets/hero.mp4" type="video/mp4" />
+      <!-- Swap in a real royalty-free clip from Pexels/Coverr — see README. -->
+    </video>
+
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="container hero-content reveal">
+      <h1>Ihr Zuhause. Intelligent vernetzt. Energie im Griff.</h1>
+      <p class="lead">
+        Herstellerunabhängiges Smart-Home- und Energiemanagement-Consulting für
+        Olching und das FFB-Land — auf Basis eines lokalen Home-Servers.
+        Mit Fokus auf Qualität, Datenschutz und Energieeffizienz. Lokal, privat,
+        ohne Cloud-Zwang.
+      </p>
+
+      <!-- ================= WAITLIST FORM (glass card) ================= -->
+      <div class="glass">
+        <div class="scarcity"><span class="dot"></span> Beta-Plätze begrenzt</div>
+        <h3>Auf die Warteliste</h3>
+        <p class="muted">
+          Wir starten in Kürze mit einer kleinen Beta-Runde. Tragen Sie sich
+          unverbindlich ein und wir melden uns zum Launch.
+        </p>
+
+        <!--
+          ================= WAITLIST FORM → dahoamsmart@gmail.com =================
+          Submissions reach the owner's inbox via the JS handler at the bottom
+          of this file. Behaviour depends on the FORM_ENDPOINT constant there:
+            • FORM_ENDPOINT set  → POSTs email + name + consent timestamp to an
+              EU/DSGVO-friendly form backend (e.g. Formspree EU) whose target
+              inbox is dahoamsmart@gmail.com. The backend sends the real
+              Double-Opt-In confirmation email.
+            • FORM_ENDPOINT blank → falls back to a mailto: draft addressed to
+              dahoamsmart@gmail.com (works with no backend, but cannot do a
+              true DOI — see the README block at the top of this file).
+          The required, non-pre-checked consent checkbox gates submission in
+          both cases. DSGVO: an AVV/DPA with the form provider is required and
+          the provider must be added to the Datenschutzerklärung before launch.
+          No third-party tracking is loaded here.
+        -->
+        <form id="waitlist-form" novalidate>
+          <div class="field">
+            <label for="wl-email">E-Mail-Adresse *</label>
+            <input id="wl-email" name="email" type="email" required
+                   placeholder="name@beispiel.de" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="wl-name">Name (optional)</label>
+            <input id="wl-name" name="name" type="text"
+                   placeholder="Ihr Name" autocomplete="name" />
+          </div>
+
+          <!-- Non-pre-checked, REQUIRED DSGVO consent -->
+          <label class="consent">
+            <input type="checkbox" id="wl-consent" name="consent" required />
+            <span>
+              Ich möchte per E-Mail über den Beta-Start informiert werden und
+              willige in die Verarbeitung meiner Angaben gemäß der
+              <a href="#datenschutz">Datenschutzerklärung</a> ein. Diese
+              Einwilligung kann ich jederzeit widerrufen. *
+            </span>
+          </label>
+
+          <!-- Consent timestamp (proof of consent); filled in on submit. -->
+          <input type="hidden" id="wl-consent-ts" name="consent_timestamp" value="" />
+          <!-- Subject line for the form backend / mailto fallback. -->
+          <input type="hidden" name="_subject" value="Neue Warteliste-Anmeldung · Dahoam Smart" />
+
+          <button type="submit" class="btn btn-primary btn-block">
+            Auf die Warteliste
+          </button>
+
+          <p class="form-note">
+            Double-Opt-In: Nach dem Absenden erhalten Sie eine E-Mail zur
+            Bestätigung Ihrer Anmeldung. * Pflichtfelder.
+          </p>
+        </form>
+
+        <div class="form-success" id="form-success" role="status">
+          ✓ Fast geschafft! Bitte bestätigen Sie Ihre Anmeldung über den Link
+          in der E-Mail, die wir Ihnen soeben gesendet haben (Double-Opt-In).
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================= PROBLEM / SOLUTION ======================= -->
+  <section class="block" id="loesung">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Problem &amp; Lösung</span>
+        <h2>Smart Home klingt einfach — bis Geräte, Apps und Tarife nicht zusammenspielen.</h2>
+        <p>
+          Viele Systeme setzen auf die Cloud, binden an einen Hersteller und
+          verschenken Potenzial bei PV-Anlage, Wärmepumpe und E-Auto. Wir
+          bringen Ihre Komponenten auf einem lokalen Home-Server im Haus
+          zusammen — bedient über eine eigene App bzw. ein übersichtliches
+          Dashboard auf Handy und Tablet.
+        </p>
+      </div>
+
+      <div class="split">
+        <div class="ps-card reveal">
+          <h3>Die typische Ausgangslage</h3>
+          <ul class="ps-list">
+            <li><span class="ic x">✕</span> Insellösungen: jede App macht ihr eigenes Ding</li>
+            <li><span class="ic x">✕</span> Cloud-Zwang &amp; unklare Datenflüsse</li>
+            <li><span class="ic x">✕</span> PV-Strom fließt ins Netz statt ins E-Auto</li>
+            <li><span class="ic x">✕</span> Dynamische Tarife bleiben ungenutzt</li>
+          </ul>
+        </div>
+        <div class="ps-card reveal">
+          <h3>Unser Ansatz mit lokalem Home-Server</h3>
+          <ul class="ps-list">
+            <li><span class="ic v">✓</span> Eine herstellerunabhängige, lokale Steuerungszentrale</li>
+            <li><span class="ic v">✓</span> Bedienung per eigener App bzw. übersichtlichem Dashboard</li>
+            <li><span class="ic v">✓</span> Daten bleiben im Haus — ohne Cloud-Zwang</li>
+            <li><span class="ic v">✓</span> Automatisierungen für PV, Speicher &amp; Ladepunkt</li>
+            <li><span class="ic v">✓</span> Kann helfen, Energiekosten zu senken</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= BENEFIT CARDS ======================= -->
+  <section class="block alt" id="vorteile">
+    <div class="container">
+      <div class="section-head center reveal">
+        <span class="eyebrow">Worauf wir uns konzentrieren</span>
+        <h2>Drei Bausteine für ein wirklich smartes, effizientes Zuhause</h2>
+      </div>
+
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon">
+            <!-- energy / solar + charge icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>
+              <circle cx="12" cy="12" r="3.2"/>
+            </svg>
+          </div>
+          <h3>Intelligentes Energiemanagement</h3>
+          <p>
+            Selbst erzeugten Solarstrom bevorzugt ins E-Auto oder in den
+            Speicher lenken statt ihn günstig einzuspeisen — und Verbraucher
+            wie Wärmepumpe oder Wallbox automatisch in günstige Zeitfenster
+            dynamischer Stromtarife (z.&nbsp;B. Tibber- oder Awattar-Prinzip)
+            verschieben. Das kann helfen, Energiekosten zu senken — voll im
+            Rahmen Ihrer Komfortwünsche.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <div class="icon">
+            <!-- comfort / lighting + automation icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6"/>
+              <path d="M10 21h4"/>
+              <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8.9.9 1.5l.1.7h5.2l.1-.7c.1-.6.4-1.1.9-1.5A6 6 0 0 0 12 3z"/>
+            </svg>
+          </div>
+          <h3>Intelligenter Komfort</h3>
+          <p>
+            Licht, Rollos und Rollläden, Türen, Ventilatoren und mehr — sinnvoll
+            automatisiert für mehr Komfort und Alltagsentlastung. Szenen und
+            Zeitpläne sorgen dafür, dass Ihr Zuhause im richtigen Moment genau
+            das tut, was Sie möchten.
+          </p>
+        </div>
+
+        <div class="card reveal">
+          <div class="icon">
+            <!-- privacy/shield icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/>
+              <path d="M9.5 12l1.8 1.8L15 10"/>
+            </svg>
+          </div>
+          <h3>100&nbsp;% Datensouveränität</h3>
+          <p>
+            Steuerung läuft lokal auf Ihrem eigenen Home-Server. Ihre Daten
+            bleiben im Haus — kein Cloud-Zwang, keine versteckte Weitergabe an
+            Dritte.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= BETA CTA ======================= -->
+  <section class="block" id="beta">
+    <div class="container reveal">
+      <div class="cta-band">
+        <div class="scarcity"><span class="dot"></span> Beta-Plätze begrenzt</div>
+        <h2>Werden Sie Teil der Beta in Olching &amp; Umgebung</h2>
+        <p>
+          Wir starten mit einer kleinen Gruppe von Haushalten im FFB-Land.
+          Sichern Sie sich unverbindlich einen Platz auf der Warteliste —
+          wir melden uns persönlich zum Launch.
+        </p>
+        <a href="#hero" class="btn btn-primary">Auf die Warteliste</a>
+      </div>
+
+      <!-- "Wichtig" de-risking note — relocated here, lower on the page,
+           out of the hero/top area (was previously in the Lösung section). -->
+      <div class="disclaimer reveal">
+        <span>ⓘ</span>
+        <span>
+          <strong>Wichtig:</strong> Wir planen und konfigurieren; die
+          230V-Installation übernimmt Ihr Elektrofachbetrieb. Wir versprechen
+          keine konkreten Einspar­beträge — jedes Zuhause ist anders.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= FOOTER ======================= -->
+  <footer>
+    <div class="container">
+      <div class="foot-top">
+        <div>
+          <a href="#hero" class="brand"><span class="logo">⌂</span> Dahoam&nbsp;Smart</a>
+          <p style="max-width:340px; margin:0;">
+            Smart-Home- &amp; Energiemanagement-Consulting auf Basis eines
+            lokalen Home-Servers. Lokal, privat, herstellerunabhängig.
+          </p>
+        </div>
+        <div class="foot-links">
+          <a href="#loesung">Lösung</a>
+          <a href="#vorteile">Vorteile</a>
+          <a href="#beta">Warteliste</a>
+          <a href="#impressum">Impressum</a>
+          <a href="#datenschutz">Datenschutz</a>
+          <a href="#disclaimer">Haftungsausschluss</a>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Dahoam Smart (i.Gr.) · 82140 Olching</span>
+        <span>Tracker-frei · keine Cookies · keine Cloud</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================= IMPRESSUM ======================= -->
+  <section class="block legal" id="impressum">
+    <div class="container">
+      <div class="card-legal reveal">
+        <span class="eyebrow">Rechtliches</span>
+        <h2>Impressum</h2>
+
+        <h3>Angaben gemäß § 5 DDG</h3>
+        <p>
+          Varun Kumar<br />
+          Siedlerstr. 9a<br />
+          82140 Olching<br />
+          Deutschland
+        </p>
+
+        <h3>Kontakt</h3>
+        <p>
+          Telefon: 017647372035<br />
+          E-Mail: dahoamsmart@gmail.com
+        </p>
+
+        <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+        <p>
+          Varun Kumar<br />
+          Siedlerstr. 9a<br />
+          82140 Olching
+        </p>
+
+        <h3>Hinweis zur Gründungsphase</h3>
+        <p>
+          Dieses Angebot befindet sich in Vorbereitung (Gewerbe in Gründung).
+          Es werden derzeit <strong>keine kostenpflichtigen Dienstleistungen
+          oder Waren</strong> angeboten oder verkauft. Diese Seite dient
+          ausschließlich dazu, das lokale Interesse zu erfassen und
+          Interessierte über den Start zu informieren.
+        </p>
+
+        <a href="#hero" class="back-top">↑ Zurück nach oben</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= DATENSCHUTZERKLÄRUNG ======================= -->
+  <section class="block legal" id="datenschutz" style="padding-top:0;">
+    <div class="container">
+      <div class="card-legal reveal">
+        <span class="eyebrow">Rechtliches</span>
+        <h2>Datenschutzerklärung</h2>
+        <p>
+          Der Schutz Ihrer Daten ist uns wichtig. Diese Seite verzichtet
+          bewusst auf Analyse-, Tracking- oder Werbe-Tools von Dritten
+          (kein Google Analytics, kein Meta Pixel) und setzt keine
+          Tracking-Cookies.
+        </p>
+
+        <h3>1. Verantwortlicher</h3>
+        <p>
+          Verantwortlich im Sinne der DSGVO ist:<br />
+          Varun Kumar,
+          Siedlerstr. 9a,
+          82140 Olching, E-Mail: dahoamsmart@gmail.com.
+        </p>
+
+        <h3>2. Hosting</h3>
+        <p>
+          Diese Website wird bei GitHub Pages gehostet, einem Dienst der
+          GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107,
+          USA (ein Unternehmen der Microsoft Corporation). Beim Aufruf der
+          Seite verarbeitet GitHub automatisch Server-Logdaten, darunter die
+          IP-Adresse der Besucherin bzw. des Besuchers, um die Auslieferung
+          der Seite technisch zu ermöglichen und die Sicherheit zu
+          gewährleisten.
+        </p>
+        <p>
+          Die damit verbundene Übermittlung von Daten in die USA stützt sich
+          auf das EU-US Data Privacy Framework; GitHub bzw. Microsoft ist
+          unter diesem Rahmen zertifiziert. Rechtsgrundlage für den Einsatz des
+          Hosters ist unser berechtigtes Interesse an einer sicheren,
+          zuverlässigen und kostengünstigen Bereitstellung dieser Seite gemäß
+          <strong>Art. 6 Abs. 1 lit. f DSGVO</strong>. Ein Wechsel zu einem in
+          der EU gehosteten Server ist geplant.
+        </p>
+
+        <h3>3. Verarbeitung im Rahmen der Warteliste</h3>
+        <p>
+          Wenn Sie sich in die Warteliste eintragen, verarbeiten wir folgende
+          Daten:
+        </p>
+        <ul>
+          <li>Ihre <strong>E-Mail-Adresse</strong> (erforderlich)</li>
+          <li>Ihren <strong>Namen</strong> (optional, sofern angegeben)</li>
+          <li>Zeitpunkt der Anmeldung sowie der Double-Opt-In-Bestätigung</li>
+        </ul>
+
+        <h3>4. Zweck der Verarbeitung</h3>
+        <p>
+          Die Daten dienen ausschließlich dazu, das lokale Interesse an unserem
+          künftigen Angebot einzuschätzen und Sie zum Start (Launch) zu
+          benachrichtigen. Eine Weitergabe an Dritte zu Werbezwecken erfolgt
+          nicht.
+        </p>
+
+        <h3>5. Rechtsgrundlage</h3>
+        <p>
+          Rechtsgrundlage ist Ihre Einwilligung gemäß
+          <strong>Art. 6 Abs. 1 lit. a DSGVO</strong>. Diese erteilen Sie
+          aktiv über die Checkbox im Anmeldeformular.
+        </p>
+
+        <h3>6. Double-Opt-In-Verfahren</h3>
+        <p>
+          Nach dem Absenden des Formulars erhalten Sie eine E-Mail mit einem
+          Bestätigungslink. Erst nach Ihrem Klick auf diesen Link nehmen wir
+          Sie in die Warteliste auf (Double-Opt-In). So stellen wir sicher,
+          dass die angegebene Adresse tatsächlich Ihnen gehört.
+        </p>
+
+        <h3>7. Speicherdauer</h3>
+        <p>
+          Wir speichern Ihre Daten nur so lange, wie es für den genannten Zweck
+          erforderlich ist, längstens jedoch <strong>6 Monate</strong> ab
+          Anmeldung bzw. bis zu einem früheren Widerruf. Danach werden die
+          Daten gelöscht.
+        </p>
+
+        <h3>8. Widerruf &amp; Löschung</h3>
+        <p>
+          Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft
+          widerrufen und die Löschung Ihrer Daten verlangen — formlos per
+          E-Mail an dahoamsmart@gmail.com. Die
+          Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt
+          unberührt.
+        </p>
+
+        <h3>9. Ihre weiteren Rechte</h3>
+        <p>
+          Ihnen stehen die Rechte auf Auskunft, Berichtigung, Einschränkung der
+          Verarbeitung und Datenübertragbarkeit zu. Zudem haben Sie ein
+          Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde (in Bayern:
+          Bayerisches Landesamt für Datenschutzaufsicht, BayLDA).
+        </p>
+
+        <a href="#hero" class="back-top">↑ Zurück nach oben</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= HAFTUNGSAUSSCHLUSS / RECHTLICHE HINWEISE ======================= -->
+  <section class="block legal" id="disclaimer" style="padding-top:0;">
+    <div class="container">
+      <div class="card-legal reveal">
+        <span class="eyebrow">Rechtliches</span>
+        <h2>Haftungsausschluss / Rechtliche Hinweise</h2>
+
+        <h3>Haftung für Inhalte</h3>
+        <p>
+          Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte
+          auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach
+          §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht
+          verpflichtet, übermittelte oder gespeicherte fremde Informationen zu
+          überwachen oder nach Umständen zu forschen, die auf eine
+          rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung
+          oder Sperrung der Nutzung von Informationen nach den allgemeinen
+          Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist
+          jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten
+          Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden
+          Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.
+        </p>
+
+        <h3>Haftung für Links</h3>
+        <p>
+          Unser Angebot enthält gegebenenfalls Links zu externen Websites
+          Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können
+          wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die
+          Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder
+          Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum
+          Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft.
+          Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht
+          erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten
+          Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung
+          nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir
+          derartige Links umgehend entfernen.
+        </p>
+
+        <h3>Urheberrecht</h3>
+        <p>
+          Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen
+          Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung,
+          Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der
+          Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des
+          jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite
+          sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.
+          Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt
+          wurden, werden die Urheberrechte Dritter beachtet und als solche
+          gekennzeichnet.
+        </p>
+
+        <h3>Hinweise zu Smart-Home- &amp; Energie-Consulting</h3>
+        <p>
+          Unsere Leistungen umfassen ausschließlich Planung, Beratung und
+          Konfiguration von Smart-Home- und Energiemanagement-Lösungen.
+          <strong>Wir führen keine Arbeiten an der 230V-/Elektroinstallation
+          durch.</strong> Sämtliche Installations- und Anschlussarbeiten an der
+          Elektroinstallation werden ausschließlich von einem qualifizierten
+          Elektrofachbetrieb Ihrer Wahl ausgeführt und verantwortet.
+        </p>
+        <p>
+          Wir garantieren <strong>keine konkreten Einsparbeträge oder
+          -prozentsätze</strong> bei den Energiekosten. Mögliche Einsparungen
+          hängen von zahlreichen individuellen Faktoren ab (z.&nbsp;B.
+          Verbrauchsverhalten, vorhandene Anlagen, Tarife, Wetter) und können
+          nicht verbindlich zugesichert werden.
+        </p>
+        <p>
+          Smart-Home- und Energiemanagement-Systeme basieren teilweise auf
+          Software von Drittanbietern sowie auf quelloffener Software
+          (Open-Source). Für deren Verfügbarkeit, Aktualisierungen,
+          Kompatibilität und Weiterentwicklung übernehmen wir keine Gewähr.
+          Ebenso können wir keine unterbrechungsfreie Verfügbarkeit der
+          eingesetzten Systeme, Schnittstellen oder Onlinedienste Dritter
+          garantieren.
+        </p>
+
+        <h3>Hinweis zur Gründungsphase</h3>
+        <p>
+          Dieses Angebot befindet sich in Vorbereitung (Gewerbe in Gründung).
+          Sämtliche Inhalte dieser Seite dienen ausschließlich zu
+          Informationszwecken und stellen <strong>kein rechtlich bindendes
+          Angebot</strong> im Sinne des § 145 BGB dar. Es werden derzeit keine
+          kostenpflichtigen Dienstleistungen oder Waren angeboten oder
+          verkauft.
+        </p>
+
+        <a href="#hero" class="back-top">↑ Zurück nach oben</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= SCRIPTS ======================= -->
+  <script>
+    // Sticky nav: switch to solid style after scrolling past the hero top.
+    const nav = document.getElementById('nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Scroll-reveal animations via IntersectionObserver.
+    const reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add('visible'));
+    }
+
+    // ===================== WAITLIST FORM DELIVERY =====================
+    // THE ONE MANUAL STEP: paste your EU/DSGVO-friendly form-backend endpoint
+    // between the quotes below (e.g. "https://formspree.io/f/abcdwxyz"), with
+    // its target inbox set to dahoamsmart@gmail.com and Double-Opt-In enabled.
+    // Leave it as "" to use the zero-dependency mailto: fallback (not ideal
+    // for DOI — see the README block at the top of this file).
+    const FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxxx"
+    const OWNER_EMAIL   = "dahoamsmart@gmail.com";
+
+    const form = document.getElementById('waitlist-form');
+    const success = document.getElementById('form-success');
+
+    function showSuccess() {
+      // Double-Opt-In confirmation message. NOTE: the actual DOI confirmation
+      // email must be sent by the chosen form backend/tool — not by this page.
+      form.style.display = 'none';
+      success.style.display = 'block';
+      success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      // Native validation covers required email + required consent checkbox.
+      if (!form.reportValidity()) return;
+
+      // Record proof-of-consent timestamp.
+      const ts = new Date().toISOString();
+      document.getElementById('wl-consent-ts').value = ts;
+
+      const email = document.getElementById('wl-email').value.trim();
+      const name  = document.getElementById('wl-name').value.trim();
+
+      if (FORM_ENDPOINT) {
+        // PREFERRED: POST to the EU/DSGVO form backend (delivers to the inbox
+        // and triggers the provider's Double-Opt-In confirmation email).
+        const data = new FormData(form);
+        fetch(FORM_ENDPOINT, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+          .then(function () { showSuccess(); })
+          .catch(function () {
+            // On network failure, fall back to a mailto draft so nothing is lost.
+            window.location.href = buildMailto(email, name, ts);
+            showSuccess();
+          });
+      } else {
+        // FALLBACK: open a pre-filled mail draft to the owner (no backend yet).
+        window.location.href = buildMailto(email, name, ts);
+        showSuccess();
+      }
+    });
+
+    function buildMailto(email, name, ts) {
+      const subject = 'Warteliste-Anmeldung · Dahoam Smart';
+      const body =
+        'Neue Anmeldung für die Warteliste:\n\n' +
+        'E-Mail: ' + email + '\n' +
+        'Name: ' + (name || '(nicht angegeben)') + '\n' +
+        'Einwilligung (DSGVO Art. 6 Abs. 1 lit. a) erteilt am: ' + ts + '\n';
+      return 'mailto:' + OWNER_EMAIL +
+             '?subject=' + encodeURIComponent(subject) +
+             '&body=' + encodeURIComponent(body);
+    }
+  </script>
+</body>
+</html>
