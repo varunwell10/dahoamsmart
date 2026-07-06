@@ -352,6 +352,20 @@
       font-size: clamp(1.05rem, 2.2vw, 1.3rem);
       color: rgba(255,255,255,0.9);
       max-width: 640px;
+      margin-bottom: 20px;
+    }
+    .hero-neighbour {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 640px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #eafff8;
+      background: rgba(23,184,144,0.14);
+      border: 1px solid rgba(23,184,144,0.3);
+      padding: 10px 16px;
+      border-radius: 14px;
       margin-bottom: 32px;
     }
 
@@ -499,7 +513,7 @@
     /* Benefit cards */
     .cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 26px;
     }
     .card {
@@ -673,10 +687,15 @@
     <div class="container hero-content reveal">
       <h1>Ihr Zuhause. Intelligent vernetzt. Energie im Griff.</h1>
       <p class="lead">
-        Herstellerunabhängiges Smart-Home- und Energiemanagement-Consulting für
-        Olching und das FFB-Land — auf Basis eines lokalen Home-Servers.
-        Mit Fokus auf Qualität, Datenschutz und Energieeffizienz. Lokal, privat,
-        ohne Cloud-Zwang.
+        Sie haben in Smart Home investiert — aber vieles funktioniert noch
+        nicht richtig zusammen. Genau dafür sind wir da: Wir bringen Ihre
+        Komponenten auf einem lokalen Home-Server im Haus zusammen — mit Fokus
+        auf Qualität, Datenschutz und Energieeffizienz. Lokal, privat, ohne
+        Cloud-Zwang.
+      </p>
+      <p class="hero-neighbour">
+        👋 Ich bin Varun — Ihr Nachbar aus Olching. Ich bin persönlich
+        ansprechbar.
       </p>
 
       <!-- ================= WAITLIST FORM (glass card) ================= -->
@@ -770,6 +789,8 @@
           <h3>Die typische Ausgangslage</h3>
           <ul class="ps-list">
             <li><span class="ic x">✕</span> Insellösungen: jede App macht ihr eigenes Ding</li>
+            <li><span class="ic x">✕</span> Smarte Geräte, die Sie schon haben, arbeiten nicht zuverlässig zusammen</li>
+            <li><span class="ic x">✕</span> Einrichtung ist zu kompliziert — YAML, Entwickler-Tools, stundenlange Konfiguration</li>
             <li><span class="ic x">✕</span> Cloud-Zwang &amp; unklare Datenflüsse</li>
             <li><span class="ic x">✕</span> PV-Strom fließt ins Netz statt ins E-Auto</li>
             <li><span class="ic x">✕</span> Dynamische Tarife bleiben ungenutzt</li>
@@ -779,6 +800,8 @@
           <h3>Unser Ansatz mit lokalem Home-Server</h3>
           <ul class="ps-list">
             <li><span class="ic v">✓</span> Eine herstellerunabhängige, lokale Steuerungszentrale</li>
+            <li><span class="ic v">✓</span> Wir bringen zum Laufen, was Sie schon haben — egal welche Hardware</li>
+            <li><span class="ic v">✓</span> Einrichten in unter 5 Minuten — kein Programmieren, keine Vorkenntnisse nötig</li>
             <li><span class="ic v">✓</span> Bedienung per eigener App bzw. übersichtlichem Dashboard</li>
             <li><span class="ic v">✓</span> Daten bleiben im Haus — ohne Cloud-Zwang</li>
             <li><span class="ic v">✓</span> Automatisierungen für PV, Speicher &amp; Ladepunkt</li>
@@ -794,7 +817,7 @@
     <div class="container">
       <div class="section-head center reveal">
         <span class="eyebrow">Worauf wir uns konzentrieren</span>
-        <h2>Drei Bausteine für ein wirklich smartes, effizientes Zuhause</h2>
+        <h2>Was wir für Sie tun</h2>
       </div>
 
       <div class="cards">
@@ -850,6 +873,23 @@
             Dritte.
           </p>
         </div>
+
+        <div class="card reveal">
+          <div class="icon">
+            <!-- reliability / on-target icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"/>
+              <circle cx="12" cy="12" r="4.5"/>
+              <circle cx="12" cy="12" r="0.6" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <h3>Wirklich zuverlässig</h3>
+          <p>
+            Rollos landen exakt dort, wo Sie sie hingeschickt haben.
+            Automatisierungen laufen durch — auch wenn Sie nicht zu Hause sind.
+            Was wir einrichten, funktioniert verlässlich im Alltag.
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -859,7 +899,7 @@
     <div class="container reveal">
       <div class="cta-band">
         <div class="scarcity"><span class="dot"></span> Beta-Plätze begrenzt</div>
-        <h2>Werden Sie Teil der Beta in Olching &amp; Umgebung</h2>
+        <h2>Ihr Zuhause soll endlich so funktionieren, wie Sie es sich vorgestellt haben</h2>
         <p>
           Wir starten mit einer kleinen Gruppe von Haushalten im FFB-Land.
           Sichern Sie sich unverbindlich einen Platz auf der Warteliste —
