@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dahoam Smart — Smarte Rollläden zum Nachrüsten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-2: #0a1622;
+    --teal: #2dd4bf;
+    --mint: #6ee7d7;
+    --blue: #3b82f6;
+    --sky: #38bdf8;
+    --text: #e6edf3;
+    --muted: #9fb3c8;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.12);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background:
+      radial-gradient(1200px 800px at 15% -10%, rgba(45, 212, 191, 0.10), transparent 55%),
+      radial-gradient(1000px 700px at 100% 110%, rgba(59, 130, 246, 0.12), transparent 55%),
+      var(--navy-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ---------- Poster canvas ---------- */
+  .poster {
+    position: relative;
+    width: 600px;
+    height: 900px;
+    border-radius: 32px;
+    overflow: hidden;
+    background:
+      linear-gradient(160deg, #10233a 0%, var(--navy) 45%, var(--navy-2) 100%);
+    box-shadow:
+      0 40px 120px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    display: flex;
+    flex-direction: column;
+    padding: 44px 44px 32px;
+    isolation: isolate;
+  }
+
+  /* Floating gradient orbs — subtle, look great frozen */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .orb--teal {
+    width: 360px;
+    height: 360px;
+    top: -120px;
+    right: -100px;
+    background: radial-gradient(circle at 30% 30%, var(--mint), var(--teal) 45%, transparent 70%);
+    animation: float1 14s ease-in-out infinite;
+  }
+  .orb--blue {
+    width: 420px;
+    height: 420px;
+    bottom: -160px;
+    left: -140px;
+    background: radial-gradient(circle at 60% 40%, var(--sky), var(--blue) 45%, transparent 70%);
+    animation: float2 18s ease-in-out infinite;
+  }
+
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-24px, 28px) scale(1.06); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(20px, -26px) scale(1.08); }
+  }
+
+  /* Fine grid texture for depth */
+  .poster::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 30%, black, transparent 85%);
+    -webkit-mask-image: radial-gradient(circle at 50% 30%, black, transparent 85%);
+  }
+
+  .poster > * { position: relative; z-index: 1; }
+
+  /* ---------- Wordmark ---------- */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .brand__mark {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 6px 18px rgba(45, 212, 191, 0.35));
+  }
+  .wordmark {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .wordmark .accent {
+    background: linear-gradient(120deg, var(--mint), var(--sky));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ---------- Hero / tagline ---------- */
+  .hero {
+    margin-top: 26px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mint);
+    padding: 6px 13px;
+    border: 1px solid rgba(45, 212, 191, 0.35);
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.08);
+  }
+  .eyebrow .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 12px var(--mint);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .tagline {
+    margin-top: 16px;
+    font-size: 33px;
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+  }
+  .tagline .grad {
+    background: linear-gradient(120deg, var(--mint) 0%, var(--sky) 55%, var(--blue) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .painhook {
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  /* ---------- Glass feature card ---------- */
+  .card {
+    margin-top: 20px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 16px 22px;
+    box-shadow:
+      0 20px 50px rgba(0, 0, 0, 0.35),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  }
+  .feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 12px 0;
+  }
+  .feature + .feature {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .feature__icon {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border-radius: 13px;
+    background: linear-gradient(140deg, rgba(45, 212, 191, 0.20), rgba(59, 130, 246, 0.18));
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+  .feature__body p {
+    font-size: 13.5px;
+    line-height: 1.42;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .feature__body p b {
+    font-weight: 700;
+  }
+
+  /* ---------- Pricing block (centerpiece) ---------- */
+  .pricing {
+    margin-top: 18px;
+    border-radius: 22px;
+    padding: 22px 24px 20px;
+    text-align: center;
+    background: linear-gradient(150deg, rgba(45, 212, 191, 0.14), rgba(59, 130, 246, 0.16));
+    border: 1px solid rgba(110, 231, 215, 0.30);
+    position: relative;
+    overflow: hidden;
+  }
+  .pricing::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(120deg, var(--mint), var(--sky), var(--blue));
+    opacity: 0.10;
+    z-index: -1;
+    animation: sweep 8s ease-in-out infinite;
+  }
+  @keyframes sweep {
+    0%, 100% { transform: translateX(-6%); }
+    50%      { transform: translateX(6%); }
+  }
+  .pricing__label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .pricing__anchor {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    background: linear-gradient(120deg, #ffffff, var(--mint) 60%, var(--sky));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pricing__ladder {
+    margin-top: 8px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .pricing__vs {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .pricing__vs .pop {
+    background: linear-gradient(120deg, var(--mint), var(--sky));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+  }
+
+  /* ---------- CTA band ---------- */
+  .cta {
+    margin-top: 16px;
+    border-radius: 18px;
+    padding: 15px 24px;
+    text-align: center;
+    background: linear-gradient(120deg, rgba(45, 212, 191, 0.16), rgba(59, 130, 246, 0.18));
+    border: 1px solid rgba(110, 231, 215, 0.30);
+  }
+  .cta__text {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .cta__text .grad {
+    background: linear-gradient(120deg, #ffffff, var(--mint) 60%, var(--sky));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    margin-top: auto;
+    padding-top: 16px;
+    text-align: center;
+  }
+  .footer__loc {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  .footer__loc .sep { color: var(--teal); margin: 0 4px; }
+  .footer__fine {
+    margin-top: 6px;
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    opacity: 0.85;
+  }
+</style>
+</head>
+<body>
+  <div class="poster">
+    <div class="orb orb--teal"></div>
+    <div class="orb orb--blue"></div>
+
+    <!-- Wordmark -->
+    <div class="brand">
+      <svg class="brand__mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="g1" x1="4" y1="6" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6ee7d7" />
+            <stop offset="1" stop-color="#38bdf8" />
+          </linearGradient>
+        </defs>
+        <path d="M24 5 L43 21 V42 A2 2 0 0 1 41 44 H29 V31 H19 V44 H7 A2 2 0 0 1 5 42 V21 Z"
+              stroke="url(#g1)" stroke-width="2.6" stroke-linejoin="round" fill="rgba(45,212,191,0.06)"/>
+        <circle cx="24" cy="23" r="3.4" fill="url(#g1)"/>
+        <path d="M18 23 A6 6 0 0 1 30 23 M14.5 23 A9.5 9.5 0 0 1 33.5 23"
+              stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="wordmark">Dahoam <span class="accent">Smart</span></div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <span class="eyebrow"><span class="dot"></span>Nachrüsten in Olching · Beta</span>
+      <h1 class="tagline">Ihre Rollläden haben schon Motoren.<br /><span class="grad">Wir machen sie schlau.</span></h1>
+      <p class="painhook">Intelligente Rollladen-Steuerung zum Nachrüsten — für Olching &amp; Umgebung.</p>
+    </div>
+
+    <!-- Feature card -->
+    <div class="card">
+      <div class="feature">
+        <div class="feature__icon">☀️</div>
+        <div class="feature__body">
+          <p><b>Denkt mit</b> — Sonne, Wetter, Jahreszeit &amp; bayerische Ferien. Kein Wecker, kein Schalter-Marathon.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature__icon">🎯</div>
+        <div class="feature__body">
+          <p><b>Rollläden landen exakt richtig</b> — Schluss mit Verrutschen und falschen Positionen.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature__icon">🔒</div>
+        <div class="feature__body">
+          <p><b>100&nbsp;% lokal</b> — kein Cloud-Zwang, keine Abo-Kosten, Ihre Daten bleiben im Haus.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing (centerpiece) -->
+    <div class="pricing">
+      <div class="pricing__label">Ihr ganzes Haus</div>
+      <div class="pricing__anchor">ab €1.377</div>
+      <div class="pricing__ladder">Basis €990 + €129 pro Fenster · z.&nbsp;B. 10 Fenster = €2.280</div>
+      <div class="pricing__vs">Loxone-Angebot über €15.000?<br /><span class="pop">Gleiche Intelligenz — bis zu 85&nbsp;% günstiger.</span></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+      <div class="cta__text">Jetzt Beta-Platz sichern <span class="grad">→ dahoamsmart.de</span></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer__loc">Aus Olching <span class="sep">·</span> Ihr Nachbar, kein Konzern</div>
+      <div class="footer__fine">Planung &amp; Konfiguration durch Dahoam Smart · 230V-Arbeiten durch Ihren Elektrofachbetrieb</div>
+    </div>
+  </div>
+</body>
+</html>
